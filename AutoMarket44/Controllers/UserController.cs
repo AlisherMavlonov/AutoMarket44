@@ -1,6 +1,7 @@
 ﻿using AutoMarket44.Domain.Extensions;
 using AutoMarket44.Domain.ViewModels.User;
 using AutoMarket44.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoMarket44.Controllers
@@ -16,8 +17,11 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpGet]
+        [Route("/GetUsers")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetUsers()
         {
+           
             var response = await service.GetUsers();
             if (response.StatusCode == AutoMarket44.Domain.Enum.StatusCode.OK)
             {
@@ -27,18 +31,23 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpDelete]
+        [Route("/DeleteUser")]
+
         public async Task<IActionResult> DeleteUser(long id)
         {
             var response = await service.DeleteUser(id);
             if (response.StatusCode == AutoMarket44.Domain.Enum.StatusCode.OK)
             {
-                return RedirectToAction("GetAll");
+                return Ok(response.Description);
             }
             return BadRequest(response.Description);
 
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("/AddUser")]
+
         public async Task<IActionResult> Save(UserViewModel user)
         {
             if (ModelState.IsValid)

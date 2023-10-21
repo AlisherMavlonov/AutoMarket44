@@ -16,6 +16,8 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpPost]
+        [Route("/CreateProfile")]
+
         public async Task<IActionResult> Save(ProfileViewModel model)
         {
             ModelState.Remove("Id");
@@ -32,6 +34,8 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpGet]
+        [Route("/DetailProfile")]
+
         public async Task<IActionResult> Detail()
         {
             var userName = User.Identity.Name;

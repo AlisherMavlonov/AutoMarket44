@@ -8,6 +8,7 @@
         CarNotFound = 10,
 
         OrderNotFound = 20,
+        EmptyCart = 30,
 
         OK = 200,
         InternalServerError = 500

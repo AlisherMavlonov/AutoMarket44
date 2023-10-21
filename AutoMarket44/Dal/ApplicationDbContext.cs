@@ -63,18 +63,7 @@ namespace AutoMarket44.Dal
             {
                 builder.ToTable("Cars").HasKey(x => x.Id);
 
-                builder.HasData(new Car
-                {
-                    Id = 1,
-                    Name = "Sechka",
-                    Description = new string('A', 50),
-                    DateCreate = DateTime.Now.ToUniversalTime(),
-                    Speed = 230,
-                    Model = "Mers",
-                    Avatar = null,
-                    TypeCar = TypeCar.PassengerCar
-
-                });
+                
             });
             modelBuilder.Entity<Profile>(builder =>
             {
@@ -102,6 +91,7 @@ namespace AutoMarket44.Dal
             modelBuilder.Entity<Order>(builder =>
             {
                 builder.ToTable("Orders").HasKey(x => x.Id);
+                builder.Property(x => x.Id).ValueGeneratedOnAdd();
                 builder.HasOne(x => x.Basket)
                        .WithMany(b => b.Orders)
                        .HasForeignKey(r => r.BasketId);

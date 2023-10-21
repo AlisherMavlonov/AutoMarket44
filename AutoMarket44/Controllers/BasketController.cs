@@ -1,4 +1,5 @@
 ﻿using AutoMarket44.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoMarket44.Controllers
@@ -15,6 +16,8 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpGet]
+        [Route("/DetailBasket")]
+        [Authorize]
         public async Task<IActionResult> Detail()
         {
             var response = await basketService.GetItems(User.Identity.Name);
@@ -26,7 +29,8 @@ namespace AutoMarket44.Controllers
             return BadRequest(response.Description);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("/DetailBasketById")]
         public async Task<IActionResult> GetItem(long id)
         {
             var response = await basketService.GetItem(User.Identity.Name, id);

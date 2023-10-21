@@ -1,5 +1,6 @@
 ﻿using AutoMarket44.Dal.Interfaces;
 using AutoMarket44.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoMarket44.Dal.Repositories
 {
@@ -18,9 +19,10 @@ namespace AutoMarket44.Dal.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(Order entity)
+        public async Task Delete(long id)
         {
-            db.Orders.Remove(entity);
+            var order = await db.Orders.FirstOrDefaultAsync(x=>x.Id == id);
+            db.Orders.Remove(order);
             await db.SaveChangesAsync();
         }
 

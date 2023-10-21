@@ -6,7 +6,7 @@
 
         IQueryable<T> GetAll();
 
-        Task Delete(T entity);
+        Task Delete(long id);
 
         Task<T> Update(T entity);
     }

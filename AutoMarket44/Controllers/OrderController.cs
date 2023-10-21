@@ -13,20 +13,9 @@ namespace AutoMarket44.Controllers
         {
             orderService = service;
         }
-
-        [HttpGet]
-        public IActionResult CreateOrder(long id)
-        {
-            var orderModel = new CreateOrderViewModel()
-            {
-                CarId = id,
-                Login = User.Identity.Name,
-                Quantity = 0
-            };
-
-            return Ok(orderModel);
-        }
+        
         [HttpPost]
+        [Route("/CreateOrderByModel")]
         public async Task<IActionResult> CreateOrder(CreateOrderViewModel model)
         {
             if (ModelState.IsValid)
@@ -36,11 +25,16 @@ namespace AutoMarket44.Controllers
                 {
                     return Json(new { description = response.Description });
                 };
+                
+                return BadRequest(response.Description);
             }
 
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return BadRequest("Не валидные данные!!!");
+
         }
+       
         [HttpDelete]
+        [Route("/DeleteOrder")]
         public async Task<IActionResult> Delete(int Id)
         {
             var response = await orderService.Delete(Id);

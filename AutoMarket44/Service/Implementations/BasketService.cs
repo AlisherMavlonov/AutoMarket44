@@ -60,7 +60,7 @@ namespace AutoMarket44.Service.Implementations
                                     LastName = p.LastName,
                                     MiddleName = p.MiddleName,
                                     DateCreate = p.DateCreated.ToLongDateString(),
-                                    Image = c.Avatar
+                                    //Image = c.Avatar
 
                                 }).FirstOrDefault();
 
@@ -99,6 +99,14 @@ namespace AutoMarket44.Service.Implementations
                 }
 
                 var orders = user.Basket?.Orders;
+                if (orders == null)
+                {
+                    return new BaseResponse<IEnumerable<OrderViewModel>>()
+                    {
+                        Description = "В корзине нет заказов!!!",
+                        StatusCode = StatusCode.EmptyCart
+                    };
+                }
                 var response = (from p in orders
                                 join c in carRepository.GetAll() on p.CarId equals c.Id
                                 select new OrderViewModel()
@@ -108,9 +116,22 @@ namespace AutoMarket44.Service.Implementations
                                     Speed = c.Speed,
                                     TypeCar = c.TypeCar.GetDisplayName(),
                                     Model = c.Model,
-                                    Image = c.Avatar
+                                    //Image = c.Avatar,
+                                    Address = p.Address,
+                                    LastName = p.LastName,
+                                    FirstName = p.FirstName,
+                                    DateCreate = p.DateCreated.ToShortDateString(),
+                                    MiddleName = p.MiddleName
                                 });
 
+                if (!response.Any())
+                {
+                    return new BaseResponse<IEnumerable<OrderViewModel>>()
+                    {
+                        Description = "В корзине нет заказов!!!",
+                        StatusCode = StatusCode.EmptyCart
+                    };
+                }
                 return new BaseResponse<IEnumerable<OrderViewModel>>()
                 {
                     Data = response,

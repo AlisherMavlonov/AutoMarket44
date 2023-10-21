@@ -1,4 +1,5 @@
-﻿using AutoMarket44.Service.Interfaces;
+﻿using AutoMarket44.Domain.ViewModels.Car;
+using AutoMarket44.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,30 @@ namespace AutoMarket44.Controllers
         {
             carService = service;
         }
-        [HttpGet]
-        public IActionResult GetCars()
+
+        [HttpPost]
+        [Route("/AddCar")]
+        public async Task<IActionResult> Create(CarViewModel model)
         {
-            var response = carService.GetCars();
+            if (ModelState.IsValid)
+            {
+                var response = await carService.Create(model);
+                if (response.StatusCode == AutoMarket44.Domain.Enum.StatusCode.OK)
+                {
+                    return Ok(response.Data);
+                }
+                
+                return BadRequest(response.Description);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetCars")]
+        public async Task<IActionResult> GetCars()
+        {
+            var response = await carService.GetCars();
             if (response.StatusCode == AutoMarket44.Domain.Enum.StatusCode.OK)
             {
                 return Ok(response.Data);
@@ -26,6 +47,7 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpDelete]
+        [Route("/DeleteCar")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -37,8 +59,9 @@ namespace AutoMarket44.Controllers
             return BadRequest(response.Description);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Save(int id)
+        [HttpGet]
+        [Route("/GetCar")]
+        public async Task<IActionResult> Get(int id)
         {
             if (id == 0)
                 return Ok();
@@ -50,9 +73,26 @@ namespace AutoMarket44.Controllers
             }
 
             ModelState.AddModelError("", response.Description);
-            return Ok();
+            return Ok(response.Description);
         }
 
+        [HttpPut]
+        [Route("/UpdateCar")]
+        public async Task<IActionResult> UpdateCar(CarViewModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var response = await carService.Edit( model);
+                if (response.StatusCode == Domain.Enum.StatusCode.OK)
+                {
+                    return Ok(response.Description);
+                }
+
+                return BadRequest(response.Description);
+            }
+            return BadRequest("не валидный данный");
+        }
     }
 }
 

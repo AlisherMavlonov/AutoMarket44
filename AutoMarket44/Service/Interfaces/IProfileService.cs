@@ -8,5 +8,7 @@ namespace AutoMarket44.Service.Interfaces
     {
         Task<BaseResponse<ProfileViewModel>> GetProfile(string userName);
         Task<BaseResponse<Profile>> Save(ProfileViewModel profile);
+
+        //Task<BaseResponse<ProfileViewModel>> Edit(ProfileViewModel model);
     }
 }

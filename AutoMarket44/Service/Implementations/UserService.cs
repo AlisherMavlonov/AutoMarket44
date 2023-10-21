@@ -55,6 +55,8 @@ namespace AutoMarket44.Service.Implementations
 
                 await _profileRepository.Create(profile);
 
+                
+
                 return new BaseResponse<User>()
                 {
                     Data = user,
@@ -88,13 +90,14 @@ namespace AutoMarket44.Service.Implementations
                     };
                 }
 
-                await _userRepository.Delete(user);
+                await _userRepository.Delete(id);
                 _logger.LogInformation($"[UserService.DeleteUser] пользователь удален");
 
                 return new BaseResponse<bool>()
                 {
                     StatusCode = StatusCode.OK,
-                    Data = true
+                    Data = true,
+                    Description = $"{user.Name} удален из БД"
                 };
             }
             catch (Exception ex)
@@ -142,7 +145,8 @@ namespace AutoMarket44.Service.Implementations
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Role = x.Role.GetDisplayName()
+                        Role = x.Role.GetDisplayName(),
+                        Password = x.Password 
 
                     }).ToListAsync();
 

@@ -17,5 +17,7 @@ namespace AutoMarket44.Domain.Enum
         SportsCar = 4,
         [Display(Name = "Внедорожник")]
         Suv = 5,
+
+        undefined = 11
     }
 }

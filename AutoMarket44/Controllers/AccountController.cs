@@ -19,7 +19,8 @@ namespace AutoMarket44.Controllers
             accountService = service;
         }
 
-        [HttpPost("Register")]
+        [HttpPost]
+        [Route("/Register")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -38,6 +39,7 @@ namespace AutoMarket44.Controllers
         }
 
         [HttpPost]
+        [Route("/Login")]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -51,10 +53,11 @@ namespace AutoMarket44.Controllers
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return BadRequest("Ошибка!!!!!!");
+            return BadRequest(ModelState);
         }
 
         [HttpPut]
+        [Route("/LogOut")]
         [Authorize]
         public async Task<IActionResult> LogOut()
         {

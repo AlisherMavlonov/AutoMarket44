@@ -1,7 +1,9 @@
-﻿using AutoMarket44.Dal.Interfaces;
+﻿using AutoMapper;
+using AutoMarket44.Dal.Interfaces;
 using AutoMarket44.Domain.Entity;
 using AutoMarket44.Domain.Enum;
 using AutoMarket44.Domain.Extensions;
+using AutoMarket44.Domain.Mapper;
 using AutoMarket44.Domain.Response;
 using AutoMarket44.Domain.ViewModels.Car;
 using AutoMarket44.Service.Interfaces;
@@ -12,33 +14,38 @@ namespace AutoMarket44.Service.Implementations
     public class CarService : ICarService
     {
         private readonly IBaseRepository<Car> carRepository;
+        private readonly IMapper mapper;
 
-        public CarService(IBaseRepository<Car> baseRepository)
+        public CarService(IBaseRepository<Car> baseRepository, IMapper _mapper)
         {
             carRepository = baseRepository;
+            mapper = _mapper;
         }
 
-        public async Task<IBaseResponse<Car>> Create(CarViewModel model, byte[] imageData)
+        public async Task<IBaseResponse<Car>> Create(CarViewModel model)
         {
             try
             {
-                var car = new Car()
-                {
-                    Name = model.Name,
-                    Model = model.Model,
-                    Description = model.Description,
-                    DateCreate = DateTime.Now,
-                    Speed = model.Speed,
-                    TypeCar = (TypeCar)Convert.ToInt32(model.TypeCar),
-                    Price = model.Price,
-                    Avatar = imageData
-                };
+                //var car = new Car();
+                var car = mapper.Map<CarViewModel, Car>(model);
+                //var car = new Car()
+                //{
+                //    Name = model.Name,
+                //    Model = model.Model,
+                //    Description = model.Description,
+                //    DateCreate = model.DateCreate,
+                //    Speed = model.Speed,
+                //    TypeCar = (TypeCar)Convert.ToInt32(model.TypeCar),
+                //    Price = model.Price,
+                    
+                //};
 
                 await carRepository.Create(car);
 
                 return new BaseResponse<Car>()
                 {
                     StatusCode = StatusCode.OK,
+                    Description = $"{car.Name} успешно добавлено в БД",
                     Data = car
                 };
             }
@@ -61,18 +68,19 @@ namespace AutoMarket44.Service.Implementations
                 {
                     return new BaseResponse<bool>()
                     {
-                        Description = $"Car not faund",
+                        Description = $"Авто с таким Id:{id} нет в БД",
                         StatusCode = StatusCode.CarNotFound,
                         Data = false
                     };
                 }
 
-                await carRepository.Delete(car);
+                await carRepository.Delete(id);
 
                 return new BaseResponse<bool>()
                 {
                     Data = true,
-                    StatusCode = StatusCode.OK
+                    StatusCode = StatusCode.OK,
+                    Description = $"{car.Name} успешно удалено из БД!!!"
                 };
             }
             catch (Exception ex)
@@ -85,30 +93,33 @@ namespace AutoMarket44.Service.Implementations
             }
         }
 
-        public async Task<IBaseResponse<Car>> Edit(long Id, CarViewModel model)
+        public async Task<IBaseResponse<Car>> Edit(CarViewModel model)
         {
             try
             {
-                var car = await carRepository.GetAll().FirstOrDefaultAsync(x => x.Id == Id);
+                var car = await carRepository.GetAll().FirstOrDefaultAsync(x => x.Id == model.Id);
                 if (car == null)
                 {
                     return new BaseResponse<Car>()
                     {
-                        Description = $"Car not Found",
+                        Description = $"Авто с таким Id:{model.Id} нет в БД",
                         StatusCode = StatusCode.CarNotFound
                     };
                 }
-                car.Price = model.Price;
-                car.Model = model.Model;
-                car.Price = model.Price;
-                car.Speed = model.Speed;
-                car.DateCreate = DateTime.ParseExact(model.DateCreate, "yyyyMMdd HH:mm", null);
+                var editCar = mapper.Map<CarViewModel, Car>(model);
 
-                await carRepository.Update(car);
+                //car.Price = model.Price;
+                //car.Model = model.Model;
+                //car.Price = model.Price;
+                //car.Speed = model.Speed;
+                //car.DateCreate = model.DateCreate;
+
+                await carRepository.Update(editCar);
 
                 return new BaseResponse<Car>()
                 {
                     Data = car,
+                    Description = $"{car.Name} Успешно обнавлено из БД",
                     StatusCode = StatusCode.OK
                 };
             }
@@ -131,22 +142,22 @@ namespace AutoMarket44.Service.Implementations
                 {
                     return new BaseResponse<CarViewModel>()
                     {
-                        Description = $"Car not Faund",
+                        Description = $"Авто с таким Id:{Id} нет в БД",
                         StatusCode = StatusCode.CarNotFound
                     };
                 }
                 var data = new CarViewModel()
                 {
-                    DateCreate = car.DateCreate.ToLongDateString(),
+                    Id = car.Id,
+                    DateCreate = car.DateCreate,
                     Description = car.Description,
                     Name = car.Name,
                     Price = car.Price,
                     TypeCar = car.TypeCar.GetDisplayName(),
                     Speed = car.Speed,
                     Model = car.Model,
-                    Image = car.Avatar
+                    //Image = car.Avatar
                 };
-
                 return new BaseResponse<CarViewModel>()
                 {
                     Data = data,
@@ -176,7 +187,7 @@ namespace AutoMarket44.Service.Implementations
                         Name = x.Name,
                         Description = x.Description,
                         Model = x.Model,
-                        DateCreate = x.DateCreate.ToLongDateString(),
+                        DateCreate = x.DateCreate,
                         Price = x.Price,
                         TypeCar = x.TypeCar.GetDisplayName()
                     })
@@ -199,21 +210,37 @@ namespace AutoMarket44.Service.Implementations
             }
         }
 
-        public IBaseResponse<List<Car>> GetCars()
+        public async Task<IBaseResponse<List<CarViewModel>>> GetCars()
         {
             try
             {
-                var cars = carRepository.GetAll().ToList();
-                if (!cars.Any())
+
+                //var cars = carRepository.GetAll().Select(x => new CarViewModel()
+                //{
+                //    Id = x.Id,
+                //    Name = x.Name,
+                //    Description = x.Description,
+                //    Model = x.Model,
+                //    DateCreate = x.DateCreate,
+                //    Price = x.Price,
+                //    Speed = x.Speed,
+                //    TypeCar = x.TypeCar.GetDisplayName(),
+                //    NameAndModel = x.Name + " " +x.Model,
+
+                //}).ToList();
+                var carsDb = carRepository.GetAll().ToList();
+                var cars = mapper.Map<List<Car>, List<CarViewModel>>(carsDb);
+
+                if (cars.Count <= 0)
                 {
-                    return new BaseResponse<List<Car>>()
+                    return new BaseResponse<List<CarViewModel>>()
                     {
                         Description = $"Найдено 0 элементов",
-                        StatusCode = StatusCode.OK
+                        StatusCode = StatusCode.CarNotFound
                     };
                 }
 
-                return new BaseResponse<List<Car>>()
+                return new BaseResponse<List<CarViewModel>>()
                 {
                     Data = cars,
                     StatusCode = StatusCode.OK
@@ -221,7 +248,7 @@ namespace AutoMarket44.Service.Implementations
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<Car>>()
+                return new BaseResponse<List<CarViewModel>>()
                 {
                     Description = $"[GetCars]: {ex.Message}",
                     StatusCode = StatusCode.InternalServerError

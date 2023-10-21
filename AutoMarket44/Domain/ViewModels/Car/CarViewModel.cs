@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMarket44.Domain.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace AutoMarket44.Domain.ViewModels.Car
 {
@@ -12,7 +13,7 @@ namespace AutoMarket44.Domain.ViewModels.Car
         public string Name { get; set; }
 
         [Display(Name = "Описание")]
-        [MinLength(50, ErrorMessage = "Минимальная длина должна быть больше 50 символов")]
+        [MinLength(10, ErrorMessage = "Минимальная длина должна быть больше 50 символов")]
         public string Description { get; set; }
 
         [Display(Name = "Модель")]
@@ -29,14 +30,16 @@ namespace AutoMarket44.Domain.ViewModels.Car
         [Required(ErrorMessage = "Укажите стоимость")]
         public decimal Price { get; set; }
 
-        public string DateCreate { get; set; }
+        public DateTime DateCreate { get; set; }
 
         [Display(Name = "Тип автомобиля")]
         [Required(ErrorMessage = "Выберите тип")]
         public string TypeCar { get; set; }
 
-        public IFormFile Avatar { get; set; }
+        public string? NameAndModel { get; set; }
 
-        public byte[]? Image { get; set; }
+        //public IFormFile Avatar { get; set; }
+
+        //public byte[]? Image { get; set; }
     }
 }
