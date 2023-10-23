@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace AutoMarket44.Controllers
 {
+    //фффффффффффффффффффффффффффффффффффффф
     [ApiController]
     [Route("api/[controller]")]
     public class AccountController : Controller
