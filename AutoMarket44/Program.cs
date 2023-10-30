@@ -1,7 +1,10 @@
 using AutoMarket44.Dal;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using NLog.Fluent;
 using NLog.Web;
+using Serilog;
+using Log = Serilog.Log;
 
 namespace AutoMarket44
 {
@@ -38,6 +41,16 @@ namespace AutoMarket44
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
+            //Log.Logger = new LoggerConfiguration()
+            //     .MinimumLevel.Debug()
+            //     .WriteTo.Console()
+            //     .WriteTo.File("Logs/ProgramLog- .txt", rollingInterval: RollingInterval.Minute)
+            //     .CreateLogger();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration).CreateLogger();
+
+            builder.Host.UseSerilog();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -47,6 +60,7 @@ namespace AutoMarket44
                 app.UseSwaggerUI();
             }
 
+            app.UseSerilogRequestLogging();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();

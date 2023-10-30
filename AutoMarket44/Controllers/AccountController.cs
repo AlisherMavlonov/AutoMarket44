@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Serilog;
 
 namespace AutoMarket44.Controllers
 {
-    //фффффффффффффффффффффффффффффффффффффф
     [ApiController]
     [Route("api/[controller]")]
     public class AccountController : Controller
@@ -32,10 +32,12 @@ namespace AutoMarket44.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(response.Data));
 
+                    Log.Information($"Register Controller");
                     return Ok("Вы успешно зарегистрировались");
                 }
                 ModelState.AddModelError("", response.Description);
             }
+
             return BadRequest("доступ запрещен");
         }
 

@@ -2,6 +2,7 @@
 using AutoMarket44.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AutoMarket44.Controllers
 {
@@ -38,6 +39,7 @@ namespace AutoMarket44.Controllers
         [Route("/GetCars")]
         public async Task<IActionResult> GetCars()
         {
+            Log.Information("Car Controller Action: GetCars");
             var response = await carService.GetCars();
             if (response.StatusCode == AutoMarket44.Domain.Enum.StatusCode.OK)
             {
